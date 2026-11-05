@@ -5,7 +5,19 @@ document.addEventListener('DOMContentLoaded', async () => {
         const response = await fetch('data.json');
         rawData = await response.json();
         
-        initFilters();
+        // Clean and normalize text fields to eliminate duplicate variations
+        rawData = rawData.map(item => ({
+            ...item,
+            name: item.name ? item.name.trim() : '',
+            city: item.city ? item.city.trim() : '',
+            category: item.category ? item.category.trim() : '',
+            subCategory: item.subCategory ? item.subCategory.trim() : '-',
+            address: item.address ? item.address.trim() : '-',
+            phone: item.phone ? item.phone.trim() : '-',
+            mobile: item.mobile ? item.mobile.trim() : '-'
+        }));
+
+        updateFilterDropdowns(rawData);
         renderData(rawData);
         
         document.getElementById('search-input').addEventListener('input', applyFilters);
@@ -14,42 +26,19 @@ document.addEventListener('DOMContentLoaded', async () => {
         document.getElementById('subcategory-filter').addEventListener('change', applyFilters);
         document.getElementById('reset-btn').addEventListener('click', resetFilters);
         
+        document.getElementById('total-count').textContent = rawData.length.toLocaleString('ar-EG');
     } catch (error) {
         console.error('Failed to load data.json:', error);
     }
 });
 
-function initFilters() {
-    const cities = [...new Set(rawData.map(item => item.city))].filter(Boolean).sort();
-    const categories = [...new Set(rawData.map(item => item.category))].filter(Boolean).sort();
-    const subCategories = [...new Set(rawData.map(item => item.subCategory))].filter(Boolean).sort();
-
-    populateSelect('city-filter', cities);
-    populateSelect('category-filter', categories);
-    populateSelect('subcategory-filter', subCategories);
-
-    document.getElementById('total-count').textContent = rawData.length.toLocaleString('ar-EG');
-}
-
-function populateSelect(elementId, items) {
-    const select = document.getElementById(elementId);
-    items.forEach(item => {
-        if(item !== "-") {
-            const opt = document.createElement('option');
-            opt.value = item;
-            opt.textContent = item;
-            select.appendChild(opt);
-        }
-    });
-}
-
-function applyFilters() {
+function getFilteredSubset() {
     const searchVal = document.getElementById('search-input').value.trim().toLowerCase();
     const cityVal = document.getElementById('city-filter').value;
     const catVal = document.getElementById('category-filter').value;
     const subCatVal = document.getElementById('subcategory-filter').value;
 
-    const filtered = rawData.filter(item => {
+    return rawData.filter(item => {
         const matchesSearch = !searchVal || 
             item.name.toLowerCase().includes(searchVal) ||
             item.address.toLowerCase().includes(searchVal) ||
@@ -62,7 +51,49 @@ function applyFilters() {
 
         return matchesSearch && matchesCity && matchesCat && matchesSubCat;
     });
+}
 
+function updateFilterDropdowns(currentData) {
+    const citySelect = document.getElementById('city-filter');
+    const catSelect = document.getElementById('category-filter');
+    const subCatSelect = document.getElementById('subcategory-filter');
+
+    const selectedCity = citySelect.value;
+    const selectedCat = catSelect.value;
+    const selectedSubCat = subCatSelect.value;
+
+    // Get unique active options based on data pool to prevent empty selections
+    const cities = [...new Set(rawData.map(i => i.city))].filter(Boolean).sort();
+    const categories = [...new Set(rawData.map(i => i.category))].filter(Boolean).sort();
+    
+    // Subcategories available for current filtered dataset (excluding subcategory filter itself for flexibility)
+    const subCategories = [...new Set(currentData.map(i => i.subCategory))]
+        .filter(sub => sub && sub !== "-")
+        .sort();
+
+    fillSelectOptions(citySelect, cities, selectedCity, 'جميع المدن');
+    fillSelectOptions(catSelect, categories, selectedCat, 'جميع التصنيفات');
+    fillSelectOptions(subCatSelect, subCategories, selectedSubCat, 'جميع التخصصات');
+}
+
+function fillSelectOptions(selectElement, items, currentValue, defaultLabel) {
+    selectElement.innerHTML = `<option value="">${defaultLabel}</option>`;
+    items.forEach(item => {
+        const opt = document.createElement('option');
+        opt.value = item;
+        opt.textContent = item;
+        if (item === currentValue) opt.selected = true;
+        selectElement.appendChild(opt);
+    });
+}
+
+function applyFilters() {
+    // Filter data based on current inputs
+    const filtered = getFilteredSubset();
+    
+    // Update dynamic dropdowns with the filtered dataset so only valid choices remain
+    updateFilterDropdowns(filtered);
+    
     renderData(filtered);
 }
 
@@ -78,14 +109,11 @@ function renderData(data) {
     }
 
     noResults.classList.add('hidden');
-    
-    // Performance limit for initial DOM rendering
     const displayData = data.slice(0, 300);
 
     container.innerHTML = displayData.map(item => `
         <div class="bg-white rounded-2xl p-5 shadow-sm border border-slate-200/70 hover:shadow-md hover:border-blue-300 transition-all flex flex-col justify-between">
             <div>
-                <!-- Top Badge Bar -->
                 <div class="flex justify-between items-start gap-2 mb-3">
                     <span class="bg-blue-50 text-blue-700 border border-blue-100 py-1 px-3 rounded-xl text-xs font-bold">${item.category}</span>
                     <span class="bg-slate-100 text-slate-700 py-1 px-2.5 rounded-xl text-xs font-semibold flex items-center gap-1">
@@ -93,22 +121,18 @@ function renderData(data) {
                     </span>
                 </div>
 
-                <!-- Provider Name -->
                 <h3 class="text-lg font-extrabold text-slate-900 mb-1">${item.name}</h3>
                 
-                <!-- SubCategory / Specialty -->
                 ${item.subCategory !== '-' ? `<p class="text-xs font-bold text-indigo-600 mb-3 bg-indigo-50/60 py-1 px-2.5 rounded-lg inline-block">${item.subCategory}</p>` : '<div class="mb-2"></div>'}
 
-                <!-- Address -->
                 <div class="flex items-start gap-2 text-slate-600 text-sm mb-4 bg-slate-50 p-2.5 rounded-xl border border-slate-100">
                     <i class="fa-solid fa-map-pin text-slate-400 mt-1 flex-shrink-0"></i>
                     <span class="leading-relaxed">${item.address !== '-' ? item.address : 'العنوان غير متوفر'}</span>
                 </div>
             </div>
 
-            <!-- Contact Numbers Footer inside Card -->
             <div class="pt-3 border-t border-slate-100 flex flex-wrap gap-2 items-center justify-between mt-auto">
-                <div class="flex items-center gap-2">
+                <div class="flex items-center gap-2 flex-wrap">
                     ${item.phone !== '-' ? `
                         <a href="tel:${item.phone}" class="flex items-center gap-1.5 text-xs font-mono font-bold bg-blue-50 text-blue-700 hover:bg-blue-100 py-1.5 px-3 rounded-xl transition">
                             <i class="fa-solid fa-phone text-blue-500"></i> ${item.phone}
@@ -133,5 +157,7 @@ function resetFilters() {
     document.getElementById('city-filter').value = '';
     document.getElementById('category-filter').value = '';
     document.getElementById('subcategory-filter').value = '';
+    
+    updateFilterDropdowns(rawData);
     renderData(rawData);
 }
