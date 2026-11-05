@@ -3,97 +3,112 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>الدليل الطبي الشامل</title>
+    <title>الشبكة الطبية - العالمية للتأمين</title>
+    <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet">
     <style> body { font-family: 'Tajawal', sans-serif; } </style>
 </head>
-<body class="bg-slate-50 text-slate-800 min-h-screen flex flex-col">
+<body class="bg-slate-100 text-slate-800 min-h-screen flex flex-col">
 
-    <header class="bg-gradient-to-r from-blue-700 to-indigo-800 text-white shadow-lg">
-        <div class="max-w-7xl mx-auto px-4 py-6 flex flex-col sm:flex-row justify-between items-center gap-4">
-            <div class="flex items-center gap-3">
-                <div class="bg-white/10 p-3 rounded-2xl backdrop-blur-md">
-                    <i class="fa-solid font-bold fa-user-doctor text-3xl text-blue-200"></i>
+    <!-- Header -->
+    <header class="bg-gradient-to-r from-blue-900 via-blue-800 to-indigo-900 text-white shadow-xl">
+        <div class="max-w-7xl mx-auto px-4 py-6 sm:px-6 lg:px-8 flex flex-col md:flex-row justify-between items-center gap-4">
+            <div class="flex items-center gap-4">
+                <div class="bg-white/10 p-3.5 rounded-2xl backdrop-blur-md border border-white/10 shadow-inner">
+                    <i class="fa-solid fa-hospital-user text-3xl text-blue-200"></i>
                 </div>
                 <div>
-                    <h1 class="text-2xl font-extrabold tracking-tight">الدليل الطبي الفلسطيني</h1>
-                    <p class="text-blue-200 text-sm">البحث السريع في كافة المراكز والأطباء والصيدليات</p>
+                    <h1 class="text-2xl sm:text-3xl font-extrabold tracking-tight">الشبكة الطبية لشركة العالمية للتأمين</h1>
+                    <p class="text-blue-200 text-sm mt-1">البحث المتقدم في شبكة الأطباء، المستشفيات، والصيدليات</p>
                 </div>
             </div>
-            <div class="bg-blue-900/40 px-4 py-2 rounded-xl border border-blue-400/20 text-sm font-medium">
-                إجمالي الموردين: <span id="total-count" class="text-yellow-300 font-bold">0</span>
+            
+            <div class="flex items-center gap-3 w-full md:w-auto justify-between md:justify-end">
+                <!-- Download Button -->
+                <a href="Globmed.xlsx" download class="flex items-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2.5 rounded-xl font-bold text-sm shadow-md transition-all transform hover:-translate-y-0.5">
+                    <i class="fa-solid fa-file-excel"></i>
+                    <span>تحميل ملف الشبكة</span>
+                </a>
             </div>
         </div>
     </header>
 
-    <main class="max-w-7xl mx-auto px-4 py-8 flex-grow w-full">
-        <!-- Filters Section -->
-        <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-5 mb-8">
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+    <!-- Main Content -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 flex-grow w-full">
+        
+        <!-- Search & Filters Card -->
+        <div class="bg-white rounded-3xl shadow-sm border border-slate-200/80 p-6 mb-8">
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                
+                <!-- Search Box -->
                 <div>
-                    <label class="block text-xs font-bold text-slate-500 mb-1">بحث عام</label>
+                    <label class="block text-xs font-bold text-slate-500 mb-1.5">بحث بالاسم أو العنوان أو الهاتف</label>
                     <div class="relative">
-                        <i class="fa-solid fa-magnifying-glass absolute right-3 top-1/2 -translate-y-1/2 text-slate-400"></i>
-                        <input type="text" id="search-input" placeholder="ابحث بالاسم، العنوان، أو الهاتف..." 
-                            class="w-full pr-10 pl-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-blue-500 outline-none text-sm">
+                        <i class="fa-solid fa-magnifying-glass absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-400"></i>
+                        <input type="text" id="search-input" placeholder="ابحث هنا..." 
+                            class="w-full pr-10 pl-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-blue-500 outline-none text-sm transition">
                     </div>
                 </div>
+
+                <!-- City Filter -->
                 <div>
-                    <label class="block text-xs font-bold text-slate-500 mb-1">المدينة</label>
-                    <select id="city-filter" class="w-full py-2.5 px-3 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-blue-500 outline-none text-sm">
+                    <label class="block text-xs font-bold text-slate-500 mb-1.5">المدينة</label>
+                    <select id="city-filter" class="w-full py-2.5 px-3 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-blue-500 outline-none text-sm transition">
                         <option value="">جميع المدن</option>
                     </select>
                 </div>
+
+                <!-- Category Filter -->
                 <div>
-                    <label class="block text-xs font-bold text-slate-500 mb-1">التصنيف الرئيسي</label>
-                    <select id="category-filter" class="w-full py-2.5 px-3 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-blue-500 outline-none text-sm">
+                    <label class="block text-xs font-bold text-slate-500 mb-1.5">التصنيف الرئيسي</label>
+                    <select id="category-filter" class="w-full py-2.5 px-3 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-blue-500 outline-none text-sm transition">
                         <option value="">جميع التصنيفات</option>
                     </select>
                 </div>
+
+                <!-- SubCategory Filter -->
                 <div>
-                    <label class="block text-xs font-bold text-slate-500 mb-1">التصنيف الفرعي / التخصص</label>
-                    <select id="subcategory-filter" class="w-full py-2.5 px-3 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-blue-500 outline-none text-sm">
+                    <label class="block text-xs font-bold text-slate-500 mb-1.5">التصنيف الفرعي / التخصص</label>
+                    <select id="subcategory-filter" class="w-full py-2.5 px-3 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-blue-500 outline-none text-sm transition">
                         <option value="">جميع التخصصات</option>
                     </select>
                 </div>
+
             </div>
 
-            <div class="mt-5 pt-4 border-t border-slate-100 flex justify-between items-center">
-                <div class="text-xs text-slate-500 font-semibold">
-                    النتائج المطابقة: <span id="filtered-count" class="text-blue-600 font-bold text-sm">0</span>
+            <!-- Bottom Control Bar -->
+            <div class="mt-6 pt-4 border-t border-slate-100 flex flex-col sm:flex-row justify-between items-center gap-4">
+                <div class="text-sm font-medium text-slate-600">
+                    إجمالي عدد مقدمي الخدمة في الشبكة الطبية: <span id="total-count" class="text-blue-700 font-extrabold text-base">0</span> 
+                    <span class="text-xs text-slate-400 mr-2">(المعروض: <span id="filtered-count" class="font-bold text-slate-600">0</span>)</span>
                 </div>
-                <button id="reset-btn" class="flex items-center gap-2 px-4 py-2 text-sm text-rose-600 bg-rose-50 hover:bg-rose-100 rounded-xl font-bold transition">
-                    <i class="fa-solid fa-rotate-right"></i> مسح الفلاتر
+                <button id="reset-btn" class="w-full sm:w-auto flex items-center justify-center gap-2 px-4 py-2 text-sm text-rose-600 bg-rose-50 hover:bg-rose-100 rounded-xl font-bold transition">
+                    <i class="fa-solid fa-rotate-right"></i>
+                    مسح الفلاتر
                 </button>
             </div>
         </div>
 
-        <!-- Data Table -->
-        <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
-            <div class="overflow-x-auto">
-                <table class="w-full text-right text-sm">
-                    <thead class="bg-slate-100 text-slate-700 font-bold border-b border-slate-200">
-                        <tr>
-                            <th class="py-3.5 px-4">الاسم</th>
-                            <th class="py-3.5 px-4">المدينة</th>
-                            <th class="py-3.5 px-4">العنوان التفصيلي</th>
-                            <th class="py-3.5 px-4">التصنيف</th>
-                            <th class="py-3.5 px-4">التصنيف الفرعي</th>
-                            <th class="py-3.5 px-4">الهاتف</th>
-                            <th class="py-3.5 px-4">الجوال</th>
-                        </tr>
-                    </thead>
-                    <tbody id="data-table-body" class="divide-y divide-slate-100"></tbody>
-                </table>
-            </div>
-            <div id="no-results" class="hidden py-12 text-center">
-                <i class="fa-solid fa-folder-open text-4xl text-slate-300 mb-3"></i>
-                <p class="text-slate-500 font-medium">لا توجد نتائج تطابق خيارات البحث.</p>
-            </div>
+        <!-- Cards Grid View -->
+        <div id="cards-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+            <!-- Dynamic Cards will be injected here -->
         </div>
+
+        <!-- Empty State -->
+        <div id="no-results" class="hidden py-16 text-center bg-white rounded-3xl border border-slate-200">
+            <i class="fa-solid fa-face-frown text-5xl text-slate-300 mb-3"></i>
+            <p class="text-slate-500 font-bold text-lg">عذراً، لم نجد أي نتائج تطابق بحثك.</p>
+            <p class="text-slate-400 text-sm mt-1">جرب تغيير كلمات البحث أو مسح الفلاتر.</p>
+        </div>
+
     </main>
+
+    <!-- Footer -->
+    <footer class="bg-white border-t border-slate-200 py-4 mt-auto text-center text-xs text-slate-500">
+    </footer>
+
     <script src="app.js"></script>
 </body>
 </html>
