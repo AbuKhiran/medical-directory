@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>الشبكة الطبية - العالمية للتأمين</title>
-    <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet">
@@ -21,12 +20,11 @@
                 </div>
                 <div>
                     <h1 class="text-2xl sm:text-3xl font-extrabold tracking-tight">الشبكة الطبية لشركة العالمية للتأمين</h1>
-                    <p class="text-blue-200 text-sm mt-1">البحث المتقدم في شبكة الأطباء، المستشفيات، والصيدليات</p>
+                    <p class="text-blue-200 text-sm mt-1">البحث الذكي في شبكة الأطباء، المستشفيات، والصيدليات</p>
                 </div>
             </div>
             
             <div class="flex items-center gap-3 w-full md:w-auto justify-between md:justify-end">
-                <!-- Download Button -->
                 <a href="Globmed.xlsx" download class="flex items-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2.5 rounded-xl font-bold text-sm shadow-md transition-all transform hover:-translate-y-0.5">
                     <i class="fa-solid fa-file-excel"></i>
                     <span>تحميل ملف الشبكة</span>
@@ -82,7 +80,7 @@
             <div class="mt-6 pt-4 border-t border-slate-100 flex flex-col sm:flex-row justify-between items-center gap-4">
                 <div class="text-sm font-medium text-slate-600">
                     إجمالي عدد مقدمي الخدمة في الشبكة الطبية: <span id="total-count" class="text-blue-700 font-extrabold text-base">0</span> 
-                    <span class="text-xs text-slate-400 mr-2">(المعروض: <span id="filtered-count" class="font-bold text-slate-600">0</span>)</span>
+                    <span class="text-xs text-slate-400 mr-2">(المعروض حالياً: <span id="filtered-count" class="font-bold text-blue-600">0</span>)</span>
                 </div>
                 <button id="reset-btn" class="w-full sm:w-auto flex items-center justify-center gap-2 px-4 py-2 text-sm text-rose-600 bg-rose-50 hover:bg-rose-100 rounded-xl font-bold transition">
                     <i class="fa-solid fa-rotate-right"></i>
@@ -92,21 +90,20 @@
         </div>
 
         <!-- Cards Grid View -->
-        <div id="cards-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-            <!-- Dynamic Cards will be injected here -->
-        </div>
+        <div id="cards-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5"></div>
 
         <!-- Empty State -->
         <div id="no-results" class="hidden py-16 text-center bg-white rounded-3xl border border-slate-200">
             <i class="fa-solid fa-face-frown text-5xl text-slate-300 mb-3"></i>
-            <p class="text-slate-500 font-bold text-lg">عذراً، لم نجد أي نتائج تطابق بحثك.</p>
-            <p class="text-slate-400 text-sm mt-1">جرب تغيير كلمات البحث أو مسح الفلاتر.</p>
+            <p class="text-slate-500 font-bold text-lg">عذراً، لم نجد أي نتائج تطابق خيارات البحث.</p>
+            <p class="text-slate-400 text-sm mt-1">جرب تغيير خيارات الفلاتر أو مسحها.</p>
         </div>
 
     </main>
 
     <!-- Footer -->
     <footer class="bg-white border-t border-slate-200 py-4 mt-auto text-center text-xs text-slate-500">
+        جميع الحقوق محفوظة &copy; 2026 - الشركة العالمية للتأمين
     </footer>
 
     <script src="app.js"></script>
