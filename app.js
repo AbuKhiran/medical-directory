@@ -11,7 +11,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             name: item.name ? item.name.trim() : '',
             city: item.city ? item.city.trim() : '',
             category: item.category ? item.category.trim() : '',
-            subCategory: item.subCategory ? item.subCategory.trim() : '-',
+            subCategory: item.subCategory ? item.subCategory.trim().replace(/\s+/g, ' ') : '-',
             address: item.address ? item.address.trim() : '-',
             phone: item.phone ? item.phone.trim() : '-',
             mobile: item.mobile ? item.mobile.trim() : '-'
@@ -62,18 +62,41 @@ function updateFilterDropdowns(currentData) {
     const selectedCat = catSelect.value;
     const selectedSubCat = subCatSelect.value;
 
-    // Get unique active options based on data pool to prevent empty selections
-    const cities = [...new Set(rawData.map(i => i.city))].filter(Boolean).sort();
-    const categories = [...new Set(rawData.map(i => i.category))].filter(Boolean).sort();
-    
-    // Subcategories available for current filtered dataset (excluding subcategory filter itself for flexibility)
-    const subCategories = [...new Set(currentData.map(i => i.subCategory))]
-        .filter(sub => sub && sub !== "-")
-        .sort();
+    // Extract available options dynamically from the dataset that matches other active filters
+    // To keep city choices smart based on category, or vice-versa:
+    const searchVal = document.getElementById('search-input').value.trim().toLowerCase();
 
-    fillSelectOptions(citySelect, cities, selectedCity, 'جميع المدن');
-    fillSelectOptions(catSelect, categories, selectedCat, 'جميع التصنيفات');
-    fillSelectOptions(subCatSelect, subCategories, selectedSubCat, 'جميع التخصصات');
+    // Helper to get options filtered by OTHER fields
+    const getAvailableCities = () => {
+        const subset = rawData.filter(i => {
+            const matchesCat = !catSelect.value || i.category === catSelect.value;
+            const matchesSub = !subCatSelect.value || i.subCategory === subCatSelect.value;
+            return matchesCat && matchesSub;
+        });
+        return [...new Set(subset.map(i => i.city))].filter(Boolean).sort();
+    };
+
+    const getAvailableCategories = () => {
+        const subset = rawData.filter(i => {
+            const matchesCity = !citySelect.value || i.city === citySelect.value;
+            const matchesSub = !subCatSelect.value || i.subCategory === subCatSelect.value;
+            return matchesCity && matchesSub;
+        });
+        return [...new Set(subset.map(i => i.category))].filter(Boolean).sort();
+    };
+
+    const getAvailableSubCategories = () => {
+        const subset = rawData.filter(i => {
+            const matchesCity = !citySelect.value || i.city === citySelect.value;
+            const matchesCat = !catSelect.value || i.category === catSelect.value;
+            return matchesCity && matchesCat;
+        });
+        return [...new Set(subset.map(i => i.subCategory))].filter(sub => sub && sub !== "-").sort();
+    };
+
+    fillSelectOptions(citySelect, getAvailableCities(), selectedCity, 'جميع المدن');
+    fillSelectOptions(catSelect, getAvailableCategories(), selectedCat, 'جميع التصنيفات');
+    fillSelectOptions(subCatSelect, getAvailableSubCategories(), selectedSubCat, 'جميع التخصصات');
 }
 
 function fillSelectOptions(selectElement, items, currentValue, defaultLabel) {
@@ -88,12 +111,8 @@ function fillSelectOptions(selectElement, items, currentValue, defaultLabel) {
 }
 
 function applyFilters() {
-    // Filter data based on current inputs
     const filtered = getFilteredSubset();
-    
-    // Update dynamic dropdowns with the filtered dataset so only valid choices remain
     updateFilterDropdowns(filtered);
-    
     renderData(filtered);
 }
 
