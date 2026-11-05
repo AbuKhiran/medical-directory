@@ -4,6 +4,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     try {
         const response = await fetch('data.json');
         rawData = await response.json();
+        
         initFilters();
         renderData(rawData);
         
@@ -12,24 +13,26 @@ document.addEventListener('DOMContentLoaded', async () => {
         document.getElementById('category-filter').addEventListener('change', applyFilters);
         document.getElementById('subcategory-filter').addEventListener('change', applyFilters);
         document.getElementById('reset-btn').addEventListener('click', resetFilters);
+        
     } catch (error) {
-        console.error('Error loading data:', error);
+        console.error('Failed to load data.json:', error);
     }
 });
 
 function initFilters() {
-    const cities = [...new Set(rawData.map(i => i.city))].filter(Boolean).sort();
-    const categories = [...new Set(rawData.map(i => i.category))].filter(Boolean).sort();
-    const subCategories = [...new Set(rawData.map(i => i.subCategory))].filter(Boolean).sort();
+    const cities = [...new Set(rawData.map(item => item.city))].filter(Boolean).sort();
+    const categories = [...new Set(rawData.map(item => item.category))].filter(Boolean).sort();
+    const subCategories = [...new Set(rawData.map(item => item.subCategory))].filter(Boolean).sort();
 
     populateSelect('city-filter', cities);
     populateSelect('category-filter', categories);
     populateSelect('subcategory-filter', subCategories);
+
     document.getElementById('total-count').textContent = rawData.length.toLocaleString('ar-EG');
 }
 
-function populateSelect(id, items) {
-    const select = document.getElementById(id);
+function populateSelect(elementId, items) {
+    const select = document.getElementById(elementId);
     items.forEach(item => {
         if(item !== "-") {
             const opt = document.createElement('option');
@@ -64,27 +67,64 @@ function applyFilters() {
 }
 
 function renderData(data) {
-    const tbody = document.getElementById('data-table-body');
+    const container = document.getElementById('cards-container');
     const noResults = document.getElementById('no-results');
     document.getElementById('filtered-count').textContent = data.length.toLocaleString('ar-EG');
 
     if (data.length === 0) {
-        tbody.innerHTML = '';
+        container.innerHTML = '';
         noResults.classList.remove('hidden');
         return;
     }
+
     noResults.classList.add('hidden');
     
-    tbody.innerHTML = data.slice(0, 500).map(item => `
-        <tr class="hover:bg-blue-50/50 transition-colors border-b border-slate-100">
-            <td class="py-3 px-4 font-bold text-slate-800">${item.name}</td>
-            <td class="py-3 px-4"><span class="bg-slate-100 text-slate-700 py-1 px-2.5 rounded-lg text-xs font-semibold">${item.city}</span></td>
-            <td class="py-3 px-4 text-slate-600 truncate max-w-xs" title="${item.address}">${item.address}</td>
-            <td class="py-3 px-4"><span class="bg-blue-50 text-blue-700 border border-blue-100 py-1 px-2.5 rounded-lg text-xs font-medium">${item.category}</span></td>
-            <td class="py-3 px-4 text-slate-600">${item.subCategory !== '-' ? item.subCategory : '-'}</td>
-            <td class="py-3 px-4 dir-ltr text-right font-mono text-xs text-slate-600">${item.phone !== '-' ? `<a href="tel:${item.phone}" class="hover:text-blue-600"><i class="fa-solid fa-phone text-blue-500 ml-1"></i>${item.phone}</a>` : '-'}</td>
-            <td class="py-3 px-4 dir-ltr text-right font-mono text-xs text-slate-600">${item.mobile !== '-' ? `<a href="tel:${item.mobile}" class="hover:text-emerald-600"><i class="fa-solid fa-mobile-screen text-emerald-500 ml-1"></i>${item.mobile}</a>` : '-'}</td>
-        </tr>
+    // Performance limit for initial DOM rendering
+    const displayData = data.slice(0, 300);
+
+    container.innerHTML = displayData.map(item => `
+        <div class="bg-white rounded-2xl p-5 shadow-sm border border-slate-200/70 hover:shadow-md hover:border-blue-300 transition-all flex flex-col justify-between">
+            <div>
+                <!-- Top Badge Bar -->
+                <div class="flex justify-between items-start gap-2 mb-3">
+                    <span class="bg-blue-50 text-blue-700 border border-blue-100 py-1 px-3 rounded-xl text-xs font-bold">${item.category}</span>
+                    <span class="bg-slate-100 text-slate-700 py-1 px-2.5 rounded-xl text-xs font-semibold flex items-center gap-1">
+                        <i class="fa-solid fa-location-dot text-rose-500"></i> ${item.city}
+                    </span>
+                </div>
+
+                <!-- Provider Name -->
+                <h3 class="text-lg font-extrabold text-slate-900 mb-1">${item.name}</h3>
+                
+                <!-- SubCategory / Specialty -->
+                ${item.subCategory !== '-' ? `<p class="text-xs font-bold text-indigo-600 mb-3 bg-indigo-50/60 py-1 px-2.5 rounded-lg inline-block">${item.subCategory}</p>` : '<div class="mb-2"></div>'}
+
+                <!-- Address -->
+                <div class="flex items-start gap-2 text-slate-600 text-sm mb-4 bg-slate-50 p-2.5 rounded-xl border border-slate-100">
+                    <i class="fa-solid fa-map-pin text-slate-400 mt-1 flex-shrink-0"></i>
+                    <span class="leading-relaxed">${item.address !== '-' ? item.address : 'العنوان غير متوفر'}</span>
+                </div>
+            </div>
+
+            <!-- Contact Numbers Footer inside Card -->
+            <div class="pt-3 border-t border-slate-100 flex flex-wrap gap-2 items-center justify-between mt-auto">
+                <div class="flex items-center gap-2">
+                    ${item.phone !== '-' ? `
+                        <a href="tel:${item.phone}" class="flex items-center gap-1.5 text-xs font-mono font-bold bg-blue-50 text-blue-700 hover:bg-blue-100 py-1.5 px-3 rounded-xl transition">
+                            <i class="fa-solid fa-phone text-blue-500"></i> ${item.phone}
+                        </a>
+                    ` : ''}
+                    
+                    ${item.mobile !== '-' ? `
+                        <a href="tel:${item.mobile}" class="flex items-center gap-1.5 text-xs font-mono font-bold bg-emerald-50 text-emerald-700 hover:bg-emerald-100 py-1.5 px-3 rounded-xl transition">
+                            <i class="fa-solid fa-mobile-screen text-emerald-500"></i> ${item.mobile}
+                        </a>
+                    ` : ''}
+
+                    ${item.phone === '-' && item.mobile === '-' ? '<span class="text-xs text-slate-400">لا توجد أرقام مسجلة</span>' : ''}
+                </div>
+            </div>
+        </div>
     `).join('');
 }
 
