@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>الدليل الطبي الشامل</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet">
+    <style> body { font-family: 'Tajawal', sans-serif; } </style>
+</head>
+<body class="bg-slate-50 text-slate-800 min-h-screen flex flex-col">
+
+    <header class="bg-gradient-to-r from-blue-700 to-indigo-800 text-white shadow-lg">
+        <div class="max-w-7xl mx-auto px-4 py-6 flex flex-col sm:flex-row justify-between items-center gap-4">
+            <div class="flex items-center gap-3">
+                <div class="bg-white/10 p-3 rounded-2xl backdrop-blur-md">
+                    <i class="fa-solid font-bold fa-user-doctor text-3xl text-blue-200"></i>
+                </div>
+                <div>
+                    <h1 class="text-2xl font-extrabold tracking-tight">الدليل الطبي الفلسطيني</h1>
+                    <p class="text-blue-200 text-sm">البحث السريع في كافة المراكز والأطباء والصيدليات</p>
+                </div>
+            </div>
+            <div class="bg-blue-900/40 px-4 py-2 rounded-xl border border-blue-400/20 text-sm font-medium">
+                إجمالي الموردين: <span id="total-count" class="text-yellow-300 font-bold">0</span>
+            </div>
+        </div>
+    </header>
+
+    <main class="max-w-7xl mx-auto px-4 py-8 flex-grow w-full">
+        <!-- Filters Section -->
+        <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-5 mb-8">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                <div>
+                    <label class="block text-xs font-bold text-slate-500 mb-1">بحث عام</label>
+                    <div class="relative">
+                        <i class="fa-solid fa-magnifying-glass absolute right-3 top-1/2 -translate-y-1/2 text-slate-400"></i>
+                        <input type="text" id="search-input" placeholder="ابحث بالاسم، العنوان، أو الهاتف..." 
+                            class="w-full pr-10 pl-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-blue-500 outline-none text-sm">
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-slate-500 mb-1">المدينة</label>
+                    <select id="city-filter" class="w-full py-2.5 px-3 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-blue-500 outline-none text-sm">
+                        <option value="">جميع المدن</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-slate-500 mb-1">التصنيف الرئيسي</label>
+                    <select id="category-filter" class="w-full py-2.5 px-3 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-blue-500 outline-none text-sm">
+                        <option value="">جميع التصنيفات</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-slate-500 mb-1">التصنيف الفرعي / التخصص</label>
+                    <select id="subcategory-filter" class="w-full py-2.5 px-3 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-blue-500 outline-none text-sm">
+                        <option value="">جميع التخصصات</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="mt-5 pt-4 border-t border-slate-100 flex justify-between items-center">
+                <div class="text-xs text-slate-500 font-semibold">
+                    النتائج المطابقة: <span id="filtered-count" class="text-blue-600 font-bold text-sm">0</span>
+                </div>
+                <button id="reset-btn" class="flex items-center gap-2 px-4 py-2 text-sm text-rose-600 bg-rose-50 hover:bg-rose-100 rounded-xl font-bold transition">
+                    <i class="fa-solid fa-rotate-right"></i> مسح الفلاتر
+                </button>
+            </div>
+        </div>
+
+        <!-- Data Table -->
+        <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+            <div class="overflow-x-auto">
+                <table class="w-full text-right text-sm">
+                    <thead class="bg-slate-100 text-slate-700 font-bold border-b border-slate-200">
+                        <tr>
+                            <th class="py-3.5 px-4">الاسم</th>
+                            <th class="py-3.5 px-4">المدينة</th>
+                            <th class="py-3.5 px-4">العنوان التفصيلي</th>
+                            <th class="py-3.5 px-4">التصنيف</th>
+                            <th class="py-3.5 px-4">التصنيف الفرعي</th>
+                            <th class="py-3.5 px-4">الهاتف</th>
+                            <th class="py-3.5 px-4">الجوال</th>
+                        </tr>
+                    </thead>
+                    <tbody id="data-table-body" class="divide-y divide-slate-100"></tbody>
+                </table>
+            </div>
+            <div id="no-results" class="hidden py-12 text-center">
+                <i class="fa-solid fa-folder-open text-4xl text-slate-300 mb-3"></i>
+                <p class="text-slate-500 font-medium">لا توجد نتائج تطابق خيارات البحث.</p>
+            </div>
+        </div>
+    </main>
+    <script src="app.js"></script>
+</body>
+</html>
