@@ -4,7 +4,15 @@ let currentSelectedItem = null;
 document.addEventListener('DOMContentLoaded', async () => {
     try {
         const response = await fetch('data.json');
-        rawData = await response.json();
+        const jsonResult = await response.json();
+        
+        // Handle both old array format or new wrapper object format safely
+        if (jsonResult.lastUpdated) {
+            document.getElementById('last-updated-text').textContent = `آخر تحديث للملف: ${jsonResult.lastUpdated}`;
+            rawData = jsonResult.data;
+        } else {
+            rawData = jsonResult; // fallback if old format
+        }
         
         rawData = rawData.map(item => ({
             ...item,
@@ -202,7 +210,6 @@ function openModal(index) {
                 ` : ''}
             </div>
 
-            <!-- WhatsApp Share Button -->
             <button onclick="shareWhatsApp()" class="w-full flex items-center justify-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 px-4 rounded-2xl shadow-md transition-all">
                 <i class="fa-brands fa-whatsapp text-xl"></i>
                 <span>مشاركة البطاقة عبر الواتساب</span>
