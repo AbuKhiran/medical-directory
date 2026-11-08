@@ -1,6 +1,7 @@
 import pandas as pd
 import json
 import os
+from datetime import datetime
 
 excel_path = 'Globmed.xlsx'
 output_json = 'data.json'
@@ -8,6 +9,11 @@ output_json = 'data.json'
 if not os.path.exists(excel_path):
     print("Excel file not found!")
     exit(1)
+
+# Get current modification date in format YYYY-MM-DD (or Arabic format)
+# We will format it nicely in JS, but let's store the ISO/Timestamp or formatted string
+file_mod_time = os.path.getmtime(excel_path)
+formatted_date = datetime.fromtimestamp(file_mod_time).strftime('%Y-%m-%d %H:%M')
 
 xls = pd.ExcelFile(excel_path)
 records = []
@@ -65,7 +71,13 @@ for sheet_name in xls.sheet_names:
                 "mobile": mobile if mobile != "nan" else "-"
             })
 
-with open(output_json, 'w', encoding='utf-8') as f:
-    json.dump(records, f, ensure_ascii=False, indent=2)
+# Save metadata along with records using a wrapper object
+final_output = {
+    "lastUpdated": formatted_date,
+    "data": records
+}
 
-print(f"Successfully processed {len(records)} records into {output_json}")
+with open(output_json, 'w', encoding='utf-8') as f:
+    json.dump(final_output, f, ensure_ascii=False, indent=2)
+
+print(f"Successfully processed {len(records)} records with timestamp {formatted_date}")
